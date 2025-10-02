@@ -1,34 +1,79 @@
-// @ts-check
 import eslint from '@eslint/js';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import globals from 'globals';
-import tseslint from 'typescript-eslint';
+import prettier from 'eslint-plugin-prettier';
+import tsParser from '@typescript-eslint/parser';
+import tsPlugin from '@typescript-eslint/eslint-plugin';
 
-export default tseslint.config(
+export default [
   {
-    ignores: ['eslint.config.mjs'],
+    ignores: [
+      'dist',
+      'coverage',
+      'node_modules',
+      'eslint.config.mjs',
+      'generated',
+      'prisma/migrations',
+    ],
   },
-  eslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
-  eslintPluginPrettierRecommended,
+
   {
+    files: ['**/*.js'],
+    ...eslint.configs.recommended,
     languageOptions: {
+      ecmaVersion: 2023,
+      sourceType: 'commonjs',
       globals: {
         ...globals.node,
         ...globals.jest,
       },
-      sourceType: 'commonjs',
+    },
+    plugins: {
+      prettier,
+    },
+    rules: {
+      'prettier/prettier': 'error',
+      'no-console': 'warn',
+      'no-unused-vars': 'warn',
+      'prefer-const': 'error',
+    },
+  },
+
+  {
+    files: ['**/*.ts'],
+    ...eslint.configs.recommended,
+    languageOptions: {
+      ecmaVersion: 2023,
+      sourceType: 'module',
+      globals: {
+        ...globals.node,
+        ...globals.jest,
+      },
+      parser: tsParser,
       parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
+        ecmaVersion: 2023,
+        sourceType: 'module',
+        project: './tsconfig.json',
       },
     },
-  },
-  {
+    plugins: {
+      prettier,
+      '@typescript-eslint': tsPlugin,
+    },
     rules: {
+      'prettier/prettier': 'error',
+      'no-console': 'warn',
+      'no-unused-vars': 'off',
+      'prefer-const': 'error',
       '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn'
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-unused-vars': 'warn',
     },
   },
-);
+
+  {
+    files: ['**/*.spec.ts', '**/*.test.ts'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
+];
