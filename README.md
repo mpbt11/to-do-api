@@ -1,202 +1,144 @@
 <p align="center">
-  <strong>✅ Desafio Técnico Full Stack — ToDo App</strong>
+  <strong>🚀 ToDo API</strong>
 </p>
 
-### Sobre o projeto
-Aplicação para cadastro e gerenciamento de tarefas (ToDo), com arquitetura desacoplada. Backend em NestJS + Prisma e banco PostgreSQL (ou MongoDB). Frontend esperado em Next.js (não incluso neste repositório).
+<p align="center">
+  Uma API RESTful para gerenciamento de tarefas (ToDo), construída com NestJS.
+</p>
+
+---
+
+### Visão Geral
+
+Este projeto oferece uma solução de backend robusta para um aplicativo de lista de tarefas, com foco em arquitetura desacoplada, segurança e automação. Ele inclui um sistema de autenticação e um CRUD para gerenciar tarefas.
+
+### Funcionalidades
+
+- **Autenticação de Usuário**: Cadastro e login com email e senha, utilizando tokens JWT para proteção de rotas.
+- **Gerenciamento de Tarefas**:
+  - **CRUD Completo**: Crie, edite, exclua e liste tarefas.
+  - **Segurança por Usuário**: Cada usuário pode ver e gerenciar apenas suas próprias tarefas.
+  - **Campos da Tarefa**: Cada tarefa inclui `título`, `descrição`, `status` (pendente, em_andamento, concluida), e timestamps de criação e atualização.
+- **CI/CD**: Pipeline de integração contínua configurado com GitHub Actions para garantir a qualidade do código.
+- **Pronto para Docker**: Scripts de Docker e Docker Compose para facilitar a execução em ambientes de desenvolvimento e produção.
+
+---
 
 ### Tecnologias
-- **Backend**: NestJS (TypeScript)
-- **ORM**: Prisma
-- **Banco de dados**: PostgreSQL (padrão) ou MongoDB
-- **Testes**: Jest
-- **CI**: GitHub Actions
-- **Docker**: Docker e docker-compose (opcional, recomendado)
 
-### Escopo obrigatório
-- **Autenticação**: cadastro e login por e-mail/senha; proteção de rotas (JWT ou cookies)
-- **CRUD de Tarefas**: criar, editar, deletar, listar; apenas do usuário autenticado
-- **Campos da tarefa**: id, título, descrição, status ("pendente" | "em_andamento" | "concluida"), `createdAt`, `updatedAt`
-- **Testes**: pelo menos 2 no backend (ex.: serviços de tarefas e de autenticação)
-
-### Documentação
-- Descrição do desafio: `DOCS/DESAFIO.md`
-- Setup e execução: `DOCS/SETUP.md`
----
-
-## Como executar (Backend)
-
-### 1) Pré-requisitos
-- Node.js 18+
-- npm ou yarn
-- PostgreSQL local ou via Docker
-
-### 2) Instalação
-```bash
-npm install
-```
-
-### 3) Variáveis de ambiente
-Crie um arquivo `.env` na raiz com:
-```bash
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DBNAME?schema=public"
-JWT_SECRET="sua_chave_segura"
-PORT=3000
-```
-
-### 4) Prisma (migrate e client)
-```bash
-npx prisma format
-npx prisma migrate dev -n init
-npx prisma generate
-```
-
-### 5) Executar
-```bash
-# desenvolvimento
-npm run start:dev
-
-# produção
-npm run build && npm run start:prod
-```
+- **Backend**: [NestJS](https://nestjs.com/) (TypeScript)
+- **Banco de dados**: [PostgreSQL](https://www.postgresql.org/)
+- **ORM**: [Prisma](https://www.prisma.io/)
+- **Autenticação**: [JSON Web Tokens (JWT)](https://jwt.io/)
+- **Testes**: [Jest](https://jestjs.io/)
+- **Automação**: [GitHub Actions](https://github.com/features/actions)
+- **Containerização**: [Docker](https://www.docker.com/) e [Docker Compose](https://docs.docker.com/compose/)
 
 ---
 
-## Modelos (Prisma)
-Os modelos principais estão em `prisma/schema.prisma`.
+## Primeiros Passos
 
-Exemplo simplificado esperado:
-```prisma
-model User {
-  id     Int     @id @default(autoincrement())
-  email  String  @unique
-  name   String?
-  role   Role    @default(USER)
-  tasks  Task[]
-}
+### 1. Pré-requisitos
 
-model Task {
-  id        Int      @id @default(autoincrement())
-  title     String
-  descricao String?
-  status    Status   @default(pendente)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  authorId  Int?
-  author    User?    @relation(fields: [authorId], references: [id])
-}
+Certifique-se de ter os seguintes softwares instalados:
 
-enum Role {
-  USER
-  ADMIN
-}
-
-enum Status {
-  pendente
-  em_andamento
-  concluida
-}
-```
+- [Node.js](https://nodejs.org/) (versão 18 ou superior)
+- [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+- [Docker](https://docs.docker.com/get-docker/) (recomendado)
 
 ---
 
-## Rotas (exemplo esperado)
-- `POST /auth/register` — cadastro
-- `POST /auth/login` — login (retorna JWT)
-- `GET /tasks` — lista tarefas do usuário autenticado
-- `POST /tasks` — cria tarefa
-- `PUT /tasks/:id` — atualiza tarefa
-- `DELETE /tasks/:id` — remove tarefa
+### 2. Configuração do Projeto
+
+1. **Instale as dependências:**
+
+   ```bash
+   npm install
+   ```
+
+2. **Variáveis de Ambiente:**
+
+   Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+
+   ```env
+   DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DBNAME?schema=public"
+   JWT_SECRET="sua_chave_secreta_aqui"
+   PORT=3000
+   ```
+
+   - `DATABASE_URL`: A URL de conexão com o seu banco de dados PostgreSQL.
+   - `JWT_SECRET`: Uma string secreta forte para assinar os tokens JWT.
+   - `PORT`: A porta em que a aplicação será executada.
+
+---
+
+### 3. Execução
+
+#### Com Docker Compose (Recomendado)
+
+A maneira mais fácil de iniciar a aplicação com o banco de dados:
+
+```bash
+docker-compose up --build
+```
+
+Isso irá:
+
+- Iniciar um container do PostgreSQL.
+- Construir e rodar o container da aplicação Node.js.
+- Executar as migrações do Prisma automaticamente.
+
+---
+
+#### Sem Docker
+
+Se você tem o PostgreSQL instalado localmente, siga estes passos:
+
+1. **Execute as migrações do Prisma:**
+
+   ```bash
+   npx prisma migrate deploy
+   ```
+
+2. **Inicie a aplicação:**
+
+   ```bash
+   # Modo de desenvolvimento (com hot-reload)
+   npm run start:dev
+
+   # Modo de produção
+   npm run build && npm run start:prod
+   ```
+
+---
+
+## Rotas da API
+
+| Método | Endpoint         | Descrição                                      |
+| ------ | ---------------- | ---------------------------------------------- |
+| POST   | `/auth/register` | Cadastra um novo usuário.                      |
+| POST   | `/auth/login`    | Autentica um usuário e retorna um token JWT.   |
+| GET    | `/tasks`         | Lista todas as tarefas do usuário autenticado. |
+| POST   | `/tasks`         | Cria uma nova tarefa.                          |
+| PATCH  | `/tasks/:id`     | Atualiza uma tarefa específica.                |
+| DELETE | `/tasks/:id`     | Exclui uma tarefa específica.                  |
 
 ---
 
 ## Testes
+
+Os testes unitários e de integração são executados usando o **Jest**.
+
 ```bash
-# unitários
+# Executa todos os testes
 npm run test
 
-# e2e (se configurado)
-npm run test:e2e
-
-# cobertura
+# Executa testes com relatório de cobertura
 npm run test:cov
 ```
-
-Sugestões mínimas:
-- Serviço de autenticação (hash/validação de senha, geração/validação de token)
-- Serviço de tarefas (criação, filtro por usuário, atualização de status)
-
----
-
-## GitHub Actions (CI)
-Workflow recomendado:
-- Instalar dependências
-- Rodar lint (`npm run lint`)
-- Rodar build (`npm run build`)
-- Rodar testes (`npm run test`)
-
-Exemplo básico de passos:
-```yaml
-name: CI
-on: [push, pull_request]
-jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run build
-      - run: npm test -- --ci
-```
-
----
-
-## Docker (opcional)
-Arquivo `docker-compose.yml` sugerido (Postgres + app):
-```yaml
-version: '3.9'
-services:
-  db:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: todo
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
-  api:
-    build: .
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/todo?schema=public
-      JWT_SECRET: sua_chave_segura
-      PORT: 3000
-    depends_on:
-      - db
-    ports:
-      - "3000:3000"
-
-volumes:
-  pgdata:
-```
-
-## Scripts úteis
-- `start` — inicia app
-- `start:dev` — watch mode
-- `start:prod` — inicia buildado
-- `build` — transpila para `dist`
-- `lint` — ESLint
-- `test`, `test:e2e`, `test:cov` — testes
-
----
 
 ---
 
 ## Licença
-MIT
+
+Este projeto está licenciado sob a [Licença MIT](LICENSE).
