@@ -1,60 +1,32 @@
+version: '3.9'
 services:
-  postgres:
+  db:
     image: postgres:15-alpine
-    container_name: todo-postgres
-    restart: unless-stopped
     environment:
       POSTGRES_DB: todo_db
       POSTGRES_USER: todo_user
       POSTGRES_PASSWORD: todo_password
     ports:
       - '5432:5432'
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - todo-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U todo_user -d todo_db']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  app:
+  api:
     build: .
-    container_name: todo-app
-    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://todo_user:todo_password@db:5432/todo_db?schema=public
+      JWT_SECRET: dev-secret
+      JWT_EXPIRES_IN: 1h
     ports:
       - '3000:3000'
-    environment:
-      - DATABASE_URL=postgresql://todo_user:todo_password@postgres:5432/todo_db?schema=public
-      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-      - JWT_EXPIRES_IN=7d
-      - NODE_ENV=production
-    depends_on:
-      - postgres
-    networks:
-      - todo-network
     command: >
       sh -c "
-        echo 'Aguardando PostgreSQL...' &&
         npx prisma migrate deploy &&
-        npx prisma generate &&
-        npm run start:prod
+        node dist/main.js
       "
-
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: todo-pgadmin
-    restart: unless-stopped
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@todo.com
-      PGADMIN_DEFAULT_PASSWORD: admin123
-    ports:
-      - '8080:80'
-    depends_on:
-      - postgres
-    networks:
-      - todo-network
-
-volumes:
-  postgres_data:
-
-networks:
-  todo-network:
-    driver: bridge
