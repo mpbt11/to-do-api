@@ -84,7 +84,7 @@ describe('AuthService', () => {
           email: mockUser.email,
           name: mockUser.name,
         },
-        token: mockToken,
+        access_token: mockToken,
       });
     });
 
@@ -145,7 +145,7 @@ describe('AuthService', () => {
           email: mockUser.email,
           name: mockUser.name,
         },
-        token: mockToken,
+        access_token: mockToken,
       });
     });
 
