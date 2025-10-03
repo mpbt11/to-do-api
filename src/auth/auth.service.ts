@@ -43,7 +43,7 @@ export class AuthService {
         email: user.email,
         name: user.name,
       },
-      token,
+      access_token: token,
     };
   }
 
@@ -73,7 +73,7 @@ export class AuthService {
         email: user.email,
         name: user.name,
       },
-      token,
+      access_token: token,
     };
   }
 
