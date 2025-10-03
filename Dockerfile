@@ -1,41 +1,33 @@
-# ---- Base
-FROM node:20-alpine AS base
+# Use Node.js 20 Alpine
+FROM node:20-alpine
+
+# Instalar dependências necessárias para Prisma
+RUN apk add --no-cache openssl
+
+# Definir diretório de trabalho
 WORKDIR /app
 
-# ---- Deps (com devDeps)
-FROM base AS deps
-ENV HUSKY=0
-RUN apk add --no-cache libc6-compat
+# Copiar arquivos de dependências
 COPY package*.json ./
+COPY prisma ./prisma/
 
+# Instalar dependências
 RUN npm ci
 
-
-COPY prisma ./prisma
-
+# Gerar cliente Prisma
 RUN npx prisma generate
 
-# ---- Builder
-FROM deps AS builder
-ENV HUSKY=0
+# Copiar código fonte
 COPY . .
 
-# Build da aplicação (ex.: NestJS -> dist/)
+# Build da aplicação
 RUN npm run build
 
-RUN npm prune --omit=dev
+# Verificar se o build foi criado
+RUN ls -la dist/
 
-# ---- Runner (produção)
-FROM node:20-alpine AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-ENV HUSKY=0
-
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/dist ./dist
-
+# Expor porta
 EXPOSE 3000
 
-CMD ["node", "dist/main.js"]
+# Comando de inicialização
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/main.js"]
