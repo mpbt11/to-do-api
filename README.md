@@ -50,65 +50,107 @@ Certifique-se de ter os seguintes softwares instalados:
 
 ### 2. Configuração do Projeto
 
+#### Com Docker (Recomendado)
+
+1. **Clone o repositório:**
+
+   ```bash
+   git clone <url-do-repositorio>
+   cd to-do-api
+   ```
+
+2. **Configure as variáveis de ambiente:**
+
+   ```bash
+   cp env.example .env
+   ```
+
+3. **Subir a aplicação:**
+
+   ```bash
+   docker-compose up -d
+   ```
+
+   Isso irá:
+   - Iniciar um container do PostgreSQL na porta 5432
+   - Construir e rodar o container da aplicação NestJS na porta 3000
+   - Executar as migrações do Prisma automaticamente
+
+   **Acessos:**
+   - API: http://localhost:3000
+   - Banco PostgreSQL: localhost:5432
+
+4. **Verificar se está funcionando:**
+
+   ```bash
+   # Ver logs da aplicação
+   docker-compose logs -f app
+
+   # Testar a API
+   curl http://localhost:3000/health
+   ```
+
+5. **Parar a aplicação:**
+   ```bash
+   docker-compose down
+   ```
+
+#### Sem Docker (Desenvolvimento Local)
+
 1. **Instale as dependências:**
 
    ```bash
    npm install
    ```
 
-2. **Variáveis de Ambiente:**
+2. **Configure o banco PostgreSQL localmente**
 
-   Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+3. **Configure as variáveis de ambiente:**
 
-   ```env
-   DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DBNAME?schema=public"
-   JWT_SECRET="sua_chave_secreta_aqui"
-   PORT=3000
+   ```bash
+   cp env.example .env
+   # Edite o .env com suas configurações locais
    ```
 
-   - `DATABASE_URL`: A URL de conexão com o seu banco de dados PostgreSQL.
-   - `JWT_SECRET`: Uma string secreta forte para assinar os tokens JWT.
-   - `PORT`: A porta em que a aplicação será executada.
-
----
-
-### 3. Execução
-
-#### Com Docker Compose (Recomendado)
-
-A maneira mais fácil de iniciar a aplicação com o banco de dados:
-
-```bash
-docker-compose up --build
-```
-
-Isso irá:
-
-- Iniciar um container do PostgreSQL.
-- Construir e rodar o container da aplicação Node.js.
-- Executar as migrações do Prisma automaticamente.
-
----
-
-#### Sem Docker
-
-Se você tem o PostgreSQL instalado localmente, siga estes passos:
-
-1. **Execute as migrações do Prisma:**
+4. **Execute as migrações:**
 
    ```bash
    npx prisma migrate deploy
    ```
 
-2. **Inicie a aplicação:**
+5. **Inicie a aplicação:**
 
    ```bash
-   # Modo de desenvolvimento (com hot-reload)
+   # Modo de desenvolvimento
    npm run start:dev
 
    # Modo de produção
    npm run build && npm run start:prod
    ```
+
+---
+
+## Comandos Úteis do Docker
+
+```bash
+# Ver logs em tempo real
+docker-compose logs -f app
+
+# Ver logs do banco
+docker-compose logs -f postgres
+
+# Entrar no container da aplicação
+docker exec -it todo-app sh
+
+# Entrar no banco PostgreSQL
+docker exec -it todo-postgres psql -U todo_user -d todo_db
+
+# Rebuild da aplicação
+docker-compose build app
+
+# Parar e remover volumes (CUIDADO: apaga dados)
+docker-compose down -v
+```
 
 ---
 
