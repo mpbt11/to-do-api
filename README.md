@@ -1,10 +1,6 @@
-<p align="center">
-  <strong>🚀 ToDo API</strong>
-</p>
+# ToDo API
 
-<p align="center">
-  Uma API RESTful para gerenciamento de tarefas (ToDo), construída com NestJS.
-</p>
+Uma API RESTful para gerenciamento de tarefas (ToDo), construída com NestJS.
 
 ---
 
@@ -35,6 +31,11 @@ Este projeto oferece uma solução de backend robusta para um aplicativo de list
 - **Containerização**: [Docker](https://www.docker.com/) e [Docker Compose](https://docs.docker.com/compose/)
 
 ---
+
+## Frontend (Next.js)
+
+O frontend deste projeto está disponível em:
+**https://github.com/mpbt11/to-do-app**
 
 ## Primeiros Passos
 
